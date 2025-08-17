@@ -1,5 +1,5 @@
-import type * as test from 'node:test'
-import * as path from 'node:path'
+import type test from 'node:test'
+import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 // This file contains code that we reuse between our tests.
 import helper from 'fastify-cli/helper.js'

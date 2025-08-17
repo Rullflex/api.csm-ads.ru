@@ -1,8 +1,8 @@
-import * as assert from 'node:assert'
-import { it } from 'vitest'
+import assert from 'node:assert'
+import test from 'node:test'
 import { build } from '../helper.js'
 
-it('example is loaded', async (t) => {
+test('example is loaded', async (t) => {
   const app = await build(t)
 
   const res = await app.inject({

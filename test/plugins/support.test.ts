@@ -1,8 +1,9 @@
-import * as assert from 'node:assert'
+import assert from 'node:assert'
+import test from 'node:test'
 import Fastify from 'fastify'
 import Support from '../../src/plugins/support.js'
 
-it('support works standalone', async (t) => {
+test('support works standalone', async (_t) => {
   const fastify = Fastify()
 
   void fastify.register(Support)

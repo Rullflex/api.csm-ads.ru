@@ -1,6 +1,6 @@
 import type { AutoloadPluginOptions } from '@fastify/autoload'
 import type { FastifyPluginAsync } from 'fastify'
-import * as path from 'node:path'
+import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import AutoLoad from '@fastify/autoload'
 
