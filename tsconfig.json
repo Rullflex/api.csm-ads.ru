@@ -2,8 +2,16 @@
   "extends": "fastify-tsconfig",
   "compilerOptions": {
     "target": "ES2022",
+    "baseUrl": ".",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "noStrictGenericChecks": false,
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "strict": true,
     "outDir": "dist",
     "sourceMap": true,
     "esModuleInterop": true

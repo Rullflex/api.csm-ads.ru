@@ -1,0 +1,31 @@
+import type { Campaign } from './types.js'
+import puppeteer from 'puppeteer'
+import { authorize } from './authorize.js'
+import { createCampaign } from './createCampaign.js'
+
+export async function createCampaignsByBrowser(logins: string[], campaigns: Campaign[]) {
+  const browser = await puppeteer.launch({
+    headless: false,
+    userDataDir: `${process.cwd()}/user_data`,
+  })
+
+  const page = await browser.newPage()
+  const result = await page.goto('https://direct.yandex.ru')
+
+  if (result?.url().includes('passport.yandex.ru')) {
+    await authorize(page)
+  }
+
+  const newCampaignLinks = []
+
+  for (const login of logins) {
+    for (const campaign of campaigns) {
+      const url = await createCampaign(page, login, campaign)
+      newCampaignLinks.push(url)
+    }
+  }
+
+  await browser.close()
+
+  return newCampaignLinks
+}
