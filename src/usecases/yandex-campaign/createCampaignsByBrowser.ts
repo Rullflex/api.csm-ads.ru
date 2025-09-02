@@ -5,8 +5,10 @@ import { createCampaign } from './createCampaign.js'
 
 export async function createCampaignsByBrowser(logins: string[], campaigns: Campaign[]) {
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: true,
     userDataDir: `${process.cwd()}/user_data`,
+    executablePath: '/usr/bin/chromium-browser',
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
   })
 
   const page = await browser.newPage()
