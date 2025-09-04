@@ -7,7 +7,7 @@ export async function createCampaign(page: Page, login: string, campaign: Campai
 
   await setUrl(page, campaign.fullUrl)
 
-  await page.waitForSelector('[data-testid="CampaignFormUc"]', { visible: true })
+  await page.waitForSelector('[data-testid="CampaignFormUc"]', { visible: true, timeout: 60000 })
   await sleep(200)
 
   await changeTitle(page, campaign.name)
@@ -109,6 +109,7 @@ async function setRegions(page: Page, regions: string) {
   await (await page.waitForSelector(`[data-testid="GroupRegionsTree.Regions"]`))?.click()
   await page.keyboard.type(regions)
   await page.keyboard.press('Enter')
+  await page.click('[data-testid="CampaignFormAuditory"]', { offset: { x: 10, y: 10 } }) // Сбрасываем фокус
 }
 
 async function setAudience(page: Page, audience: Audience) {
@@ -146,8 +147,10 @@ async function setAudience(page: Page, audience: Audience) {
   await page.waitForSelector('[data-testid="DeviceEditor.Select.Popup"]', { visible: true })
   for (const device of ['mobile', 'desktop', 'tablet']) {
     const isDeviceSelected = audience.devices.includes(device as Audience['devices'][0])
-    const element = await page.$(`[data-testid="DeviceEditor.Select.ListBox.${device}"][aria-selected="${!isDeviceSelected}"]`)
-    element?.click()
+
+    if (!isDeviceSelected) {
+      await (await page.waitForSelector(`[data-testid="DeviceEditor.Select.ListBox.${device}"]`, { visible: true }))?.click()
+    }
   }
 }
 

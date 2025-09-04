@@ -32,6 +32,8 @@ export async function authorize(page: Page) {
   await sleep(3000)
   // await page.click('#passp\\:toggle-challenge')
 
+  // Безопасный вход
+  // Нажмите кнопку «Подтвердить», если вы можете принять звонок или сообщение на указанный номер. Это нужно для завершения входа.
   await (await page.waitForSelector('button[data-t="button\\:action"]'))?.click()
 
   // TODO иногда делает звонок а не код и внизу появляется кнопка с таймером для подтверждения по смс
