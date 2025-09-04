@@ -15,7 +15,9 @@ export async function createCampaign(page: Page, login: string, campaign: Campai
   await setCampaignTitles(page, campaign.titles)
   await setCampaignTexts(page, campaign.texts)
 
-  // TODO - фото и видео
+  await setImages(page, campaign.images)
+
+  await setVideos(page, campaign.videos)
 
   await setSitelinks(page, campaign.sitelinks)
 
@@ -57,33 +59,81 @@ async function changeTitle(page: Page, title: string) {
 async function setCampaignTitles(page: Page, titles: string[]) {
   const elements = await page.$$('[data-testid^="CampaignTitles"][data-testid$=".clear"]')
 
-  // FIXME - почему-то не удаляет последние элементы
   for (const element of elements.reverse()) {
-    await element.click()
-    await sleep(100)
+    await element.click().then(() => sleep(100))
   }
 
   for (let i = 0; i < titles.length; i++) {
     await (await page.waitForSelector(`[data-testid="CampaignTitles${i}.textarea"]`))?.click()
-    await page.keyboard.type(titles[i])
-    await sleep(100)
+    await page.keyboard.type(titles[i]).then(() => sleep(100))
   }
 }
 
 async function setCampaignTexts(page: Page, texts: string[]) {
   const elements = await page.$$('[data-testid^="CampaignTexts"][data-testid$=".clear"]')
 
-  // FIXME - почему-то не удаляет последние элементы
   for (const element of elements.reverse()) {
-    await element.click()
-    await sleep(100)
+    await element.click().then(() => sleep(100))
   }
 
   for (let i = 0; i < texts.length; i++) {
     await (await page.waitForSelector(`[data-testid="CampaignTexts${i}.textarea"]`))?.click()
-    await page.keyboard.type(texts[i])
-    await sleep(100)
+    await page.keyboard.type(texts[i]).then(() => sleep(100))
   }
+}
+
+async function setImages(page: Page, images: string[]) {
+  /* Требования: https://yandex.ru/support/direct/efficiency/images#campaign-master */
+  await (await page.waitForSelector(`[data-testid="ImageSuggestionsEditor.Open"]`))?.click()
+  await page.waitForSelector('[data-testid="ImageSuggestionsEditorModal.SelectedImagesContainer"]', { visible: true })
+  const elements = await page.$$('[data-testid^="ImageSuggestionsEditorModal.SelectedImagesContainer.SelectedImage."][data-testid$=".CloseButton"]')
+
+  for (const element of elements.reverse()) {
+    await element.click().then(() => sleep(100))
+  }
+
+  const [fileChooser] = await Promise.all([
+    page.waitForFileChooser(),
+    page.click('[data-testid="ImageSuggestionsEditorModal.UploadZone.openFilePicker"]'),
+  ])
+
+  await fileChooser.accept(images)
+
+  const saveButton = await page.waitForSelector('[data-testid="ImageSuggestionsEditorModal.Save"]')
+  // Ждём, пока все загрузиться и кнопка станет активной (уберётся disabled)
+  await page.waitForFunction(
+    btn => !btn.hasAttribute('disabled'),
+    {},
+    saveButton,
+  )
+  await saveButton?.click()
+}
+
+async function setVideos(page: Page, videos: string[]) {
+  /* Требования: https://yandex.ru/support/direct/ru/efficiency/video */
+  await (await page.waitForSelector(`[data-testid="VideoSuggestionsEditor.Open"]`))?.click()
+  await page.waitForSelector('[data-testid="VideoSuggestionsEditor.SelectedCreativesGrid"]', { visible: true })
+  const elements = await page.$$('[data-testid^="VideoSuggestionsEditor.SelectedCreativesGrid.SelectedCreative.CloseButton."]')
+
+  for (const element of elements.reverse()) {
+    await element.click().then(() => sleep(100))
+  }
+
+  const [fileChooser] = await Promise.all([
+    page.waitForFileChooser(),
+    page.click('[data-testid="FileUploadButton"]'),
+  ])
+
+  await fileChooser.accept(videos)
+
+  const saveButton = await page.waitForSelector('[data-testid="VideoSuggestionsEditor.Save"]')
+  // Ждём, пока все загрузиться и кнопка станет активной (уберётся disabled)
+  await page.waitForFunction(
+    btn => !btn.hasAttribute('disabled'),
+    {},
+    saveButton,
+  )
+  await saveButton?.click()
 }
 
 async function setSitelinks(page: Page, sitelinks: Sitelink[]) {
@@ -110,6 +160,7 @@ async function setRegions(page: Page, regions: string) {
   await page.keyboard.type(regions)
   await page.keyboard.press('Enter')
   await page.click('[data-testid="CampaignFormAuditory"]', { offset: { x: 10, y: 10 } }) // Сбрасываем фокус
+  await sleep(200)
 }
 
 async function setAudience(page: Page, audience: Audience) {

@@ -7,13 +7,31 @@ import { YandexDirectApi } from '../../shared/api/yandex-direct-api/index.js'
 
 const yandexCampaigns: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise<void> => {
   fastify.post('/create', async (req, _reply) => {
-    const { campaigns } = normalizeValues(qs.parse(req.body as string, {
+    const files = await req.saveRequestFiles({
+      limits: {
+        fileSize: 100 * 1024 * 1024,
+      },
+    })
+
+    // keyValues + remove files
+    const body = Object.entries(files[0].fields).reduce((acc, [key, field]) => {
+      if (!field || Array.isArray(field))
+        return acc
+
+      return {
+        ...acc,
+        [key]: field.type === 'file' ? field.filename : field.value,
+      }
+    }, {})
+
+    // parse qs and normalize values to corresponding types
+    const { campaigns } = normalizeValues(qs.parse(body, {
       strictDepth: true,
       throwOnLimitExceeded: true,
-    })) // TODO - get logins
+    })) // TODO - get and pass real logins
 
     req.log.info(campaigns, 'Полученные компании')
-    return await createCampaignsByBrowser(['e-17155838'] as string[], campaigns as unknown as Campaign[])
+    return await createCampaignsByBrowser(['e-17155838'] as string[], campaigns as Campaign[])
   })
 
   fastify.get('/agencyclients', async (_request, _reply) => {

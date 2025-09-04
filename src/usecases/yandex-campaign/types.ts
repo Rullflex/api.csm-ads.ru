@@ -3,8 +3,8 @@ export interface Campaign {
   fullUrl: string
   titles: string[]
   texts: string[]
-  images: File[]
-  videos: File[]
+  images: string[]
+  videos: string[]
   sitelinks: Sitelink[]
   regions: string
   audience: Audience
