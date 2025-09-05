@@ -1,9 +1,8 @@
 import type { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
-import type { Campaign } from '@/usecases/yandex-campaign/types.js'
 import qs from 'qs'
+import { http, httpSt, YandexDirectApi } from '@/shared/api/yandex-direct-api/index.js'
 import { normalizeValues } from '@/shared/utils/normalizeValues.js'
 import { createCampaignsByBrowser } from '@/usecases/yandex-campaign/createCampaignsByBrowser.js'
-import { YandexDirectApi } from '../../shared/api/yandex-direct-api/index.js'
 
 const yandexCampaigns: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise<void> => {
   fastify.post('/create', async (req, _reply) => {
@@ -25,17 +24,26 @@ const yandexCampaigns: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts)
     }, {})
 
     // parse qs and normalize values to corresponding types
-    const { campaigns } = normalizeValues(qs.parse(body, {
+    const { logins, campaigns } = normalizeValues(qs.parse(body, {
       strictDepth: true,
       throwOnLimitExceeded: true,
-    })) // TODO - get and pass real logins
+    }))
 
     req.log.info(campaigns, 'Полученные компании')
-    return await createCampaignsByBrowser(['e-17155838'] as string[], campaigns as Campaign[])
+    return await createCampaignsByBrowser(logins, campaigns)
   })
 
-  fastify.get('/agencyclients', async (_request, _reply) => {
-    const response = await YandexDirectApi.getAgencyClients({
+  fastify.get('/agencyclients', {
+    schema: {
+      querystring: {
+        type: 'object',
+        properties: {
+          st: { type: 'boolean', default: false },
+        },
+      },
+    },
+  }, async (req, _reply) => {
+    const response = await YandexDirectApi(req.query.st ? httpSt : http).getAgencyClients({
       SelectionCriteria: {},
       FieldNames: ['ClientInfo', 'Login', 'ClientId'],
     })
