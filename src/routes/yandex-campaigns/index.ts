@@ -1,4 +1,9 @@
 import type { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+import { createWriteStream } from 'node:fs'
+import { mkdtemp, rm } from 'node:fs/promises'
+import os from 'node:os'
+import path from 'node:path'
+import { pipeline } from 'node:stream/promises'
 import qs from 'qs'
 import { http, httpSt, YandexDirectApi } from '@/shared/api/yandex-direct-api/index.js'
 import { normalizeValues } from '@/shared/utils/normalizeValues.js'
@@ -6,31 +11,31 @@ import { createCampaignsByBrowser } from '@/usecases/yandex-campaign/createCampa
 
 const yandexCampaigns: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise<void> => {
   fastify.post('/create', async (req, _reply) => {
-    const files = await req.saveRequestFiles({
-      limits: {
-        fileSize: 100 * 1024 * 1024,
-      },
-    })
+    const body = {} as Record<string, any>
+    const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'yc-uploads-'))
 
-    // keyValues + remove files
-    const body = Object.entries(files[0].fields).reduce((acc, [key, field]) => {
-      if (!field || Array.isArray(field))
-        return acc
-
-      return {
-        ...acc,
-        [key]: field.type === 'file' ? field.filename : field.value,
+    try {
+      for await (const part of req.parts({ limits: { fileSize: 100 * 1024 * 1024 } })) {
+        if (part.type === 'file') {
+          const filePath = path.join(tmpDir, part.filename)
+          await pipeline(part.file, createWriteStream(filePath))
+          body[part.fieldname] = part.filename
+        } else {
+          body[part.fieldname] = part.value
+        }
       }
-    }, {})
 
-    // parse qs and normalize values to corresponding types
-    const { logins, campaigns } = normalizeValues(qs.parse(body, {
-      strictDepth: true,
-      throwOnLimitExceeded: true,
-    }))
+      // parse qs and normalize values to corresponding types
+      const { logins, campaigns } = normalizeValues(qs.parse(body, {
+        strictDepth: true,
+        throwOnLimitExceeded: true,
+      }))
 
-    req.log.info(campaigns, 'Полученные компании')
-    return await createCampaignsByBrowser(logins, campaigns)
+      req.log.info(campaigns, 'Полученные компании')
+      return await createCampaignsByBrowser(logins, campaigns)
+    } finally {
+      await rm(tmpDir, { recursive: true, force: true })
+    }
   })
 
   fastify.get('/agencyclients', {
