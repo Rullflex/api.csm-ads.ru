@@ -34,6 +34,13 @@ export interface CampaignTarget {
   price: number
   metrikaCounters: string[]
   weeklyBudget: number
+  targetActions: TargetAction[]
+}
+
+export interface TargetAction {
+  name: string
+  price: number
+  metricaId: string
 }
 
 export interface CampaignRecomendations {

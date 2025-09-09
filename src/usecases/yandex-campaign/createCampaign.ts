@@ -1,4 +1,4 @@
-import type { Page } from 'puppeteer'
+import type { ElementHandle, Page } from 'puppeteer'
 import type { Audience, Campaign, CampaignRecomendations, CampaignTarget, Sitelink } from './types.js'
 import { sleep } from '@/shared/utils/sleep.js'
 
@@ -13,6 +13,7 @@ export async function createCampaign(page: Page, login: string, campaign: Campai
   await changeTitle(page, campaign.name)
 
   await setCampaignTitles(page, campaign.titles)
+
   await setCampaignTexts(page, campaign.texts)
 
   await setImages(page, campaign.images)
@@ -207,22 +208,47 @@ async function setCampaignTarget(page: Page, campaignTarget: CampaignTarget) {
   await (await page.waitForSelector(`[data-testid="CampaignTargetSelect.TargetSelect.ListBox.${campaignTarget.type}"]`, { visible: true }))?.click()
 
   if (campaignTarget.type === 'INVOLVED_CONVERSION') {
+    // Счетчики Яндекс Метрики
     const removeButtonSelector = '[data-testid^="MetrikaCountersTagGroup.tag."][data-testid$=".close"]'
     let { length } = await page.$$(removeButtonSelector)
     while (length--) {
       // Толком до конца сам не понимаю зачем надо наводить и ждать, но без этого не удаляются нормально
       await page.hover(removeButtonSelector)
-      await sleep(1000)
+      await sleep(500)
       await page.click(removeButtonSelector)
     }
 
     await (await page.waitForSelector('[data-testid="MetrikaCountersTagGroup"]'))?.click() // или MetrikaCountersTagGroup.Expander если есть уже теги
     for (const counter of campaignTarget.metrikaCounters) {
-      await page.keyboard.type(counter)
+      await page.keyboard.type(String(counter))
       await page.keyboard.press('Enter')
     }
 
-    // TODO - Целевые действия
+    // Целевые действия - TargetActions
+    await sleep(2000) // ждем возможной подгрузки значений
+    await clearElements(page, '[data-testid^="TargetActions.OTHER."][data-testid$=".CloseButton"]')
+
+    await (await page.waitForSelector('[data-testid="TargetActions.OTHER.AddTargetButton"]'))?.click()
+    // const selectSearchInput = await page.waitForSelector('[data-testid="SelectSearchTargetInput"]', { visible: true })
+
+    for (const targetAction of campaignTarget.targetActions) {
+      // await selectSearchInput?.type(targetAction.name)
+      await (await page.waitForSelector(`[data-testid="AddTargetAction.OTHER.${targetAction.metricaId}"]`))?.click()
+
+      const priceInput = await page.waitForSelector(`[data-testid="TargetActions.OTHER.${targetAction.metricaId}.PriceInput"]`)
+
+      // Тут особый прикол с этим инпутом и возможностью стереть значения. Проблема в том что если первое стирание не происходит =)))
+      await sleep(300)
+      await clearInput(priceInput!)
+      await sleep(300)
+      await clearInput(priceInput!)
+
+      // await clearInput(page, `[data-testid="TargetActions.OTHER.${targetAction.metricaId}.PriceInput"]`)
+      await priceInput?.type(targetAction.price.toString())
+    }
+
+    await page.click('[data-testid="TargetActions"]', { offset: { x: 10, y: 10 } })
+    await sleep(300) // Ждем наверняка закрытия селекта
   } else {
     await (await page.waitForSelector('[data-testid="CampaignTargetSelect.StrategySelect"]'))?.click()
     await (await page.waitForSelector(`[data-testid="CampaignTargetSelect.StrategySelect.ListBox.${campaignTarget.priceStrategy}"]`, { visible: true }))?.click()
@@ -234,10 +260,7 @@ async function setCampaignTarget(page: Page, campaignTarget: CampaignTarget) {
 
   await (await page.waitForSelector('[data-testid^="BudgetWithSuggest.MultiButton.custom"]'))?.click()
   const weeklyBudgetInput = await page.waitForSelector('[data-testid="BudgetWithSuggest.PriceTextInput"]')
-  await page.$eval('input[data-testid="BudgetWithSuggest.PriceTextInput"]', (el) => {
-    el.value = ''
-    el.dispatchEvent(new Event('input', { bubbles: true }))
-  })
+  await clearInput(weeklyBudgetInput!)
   weeklyBudgetInput?.type(campaignTarget.weeklyBudget.toString())
 }
 
@@ -265,6 +288,14 @@ async function clearElements(page: Page, selector: string) {
 
   while (clearEl) {
     await clearEl.click()
+    await sleep(50) // Ждем пока элемент наверняка удалится из DOM
     clearEl = await page.$(selector)
   }
+}
+
+async function clearInput(element: ElementHandle) {
+  await element.evaluate((el) => {
+    el.value = ''
+    el.dispatchEvent(new Event('input', { bubbles: true }))
+  })
 }
