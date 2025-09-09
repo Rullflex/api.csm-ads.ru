@@ -57,11 +57,7 @@ async function changeTitle(page: Page, title: string) {
 }
 
 async function setCampaignTitles(page: Page, titles: string[]) {
-  const elements = await page.$$('[data-testid^="CampaignTitles"][data-testid$=".clear"]')
-
-  for (const element of elements.reverse()) {
-    await element.click().then(() => sleep(100))
-  }
+  await clearElements(page, '[data-testid^="CampaignTitles"][data-testid$=".clear"][class*="visible"]')
 
   for (let i = 0; i < titles.length; i++) {
     await (await page.waitForSelector(`[data-testid="CampaignTitles${i}.textarea"]`))?.click()
@@ -70,11 +66,7 @@ async function setCampaignTitles(page: Page, titles: string[]) {
 }
 
 async function setCampaignTexts(page: Page, texts: string[]) {
-  const elements = await page.$$('[data-testid^="CampaignTexts"][data-testid$=".clear"]')
-
-  for (const element of elements.reverse()) {
-    await element.click().then(() => sleep(100))
-  }
+  await clearElements(page, '[data-testid^="CampaignTexts"][data-testid$=".clear"][class*="visible"]')
 
   for (let i = 0; i < texts.length; i++) {
     await (await page.waitForSelector(`[data-testid="CampaignTexts${i}.textarea"]`))?.click()
@@ -261,4 +253,13 @@ async function setCampaignRecomendations(page: Page, campaignRecomendations: Cam
   await enableAlternativeTextsCheckbox?.hover()
   await sleep(100)
   await enableAlternativeTextsCheckbox?.click()
+}
+
+async function clearElements(page: Page, selector: string) {
+  let clearEl = await page.$(selector)
+
+  while (clearEl) {
+    await clearEl.click()
+    clearEl = await page.$(selector)
+  }
 }
