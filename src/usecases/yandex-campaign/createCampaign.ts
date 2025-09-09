@@ -132,6 +132,8 @@ async function setVideos(page: Page, videos: string[]) {
 }
 
 async function setSitelinks(page: Page, sitelinks: Sitelink[]) {
+  await clearElements(page, '[data-testid="Sitelink.remove"]')
+
   for (let i = 0; i < sitelinks.length; i++) {
     await (await page.waitForSelector(`[data-testid="SitelinkRow.href.textarea"]`))?.click()
     await page.keyboard.type(sitelinks[i].href)
