@@ -76,56 +76,59 @@ async function setCampaignTexts(page: Page, texts: string[]) {
 
 async function setImages(page: Page, images: string[]) {
   /* Требования: https://yandex.ru/support/direct/efficiency/images#campaign-master */
-  await (await page.waitForSelector(`[data-testid="ImageSuggestionsEditor.Open"]`))?.click()
-  await page.waitForSelector('[data-testid="ImageSuggestionsEditorModal.SelectedImagesContainer"]', { visible: true })
-  const elements = await page.$$('[data-testid^="ImageSuggestionsEditorModal.SelectedImagesContainer.SelectedImage."][data-testid$=".CloseButton"]')
+  const openButton = await page.waitForSelector(`[data-testid="ImageSuggestionsEditor.Open"]`, { visible: true })
+  await clearElements(page, '[data-testid^="ImageSuggestionsEditor.CampaignContents.CloseButton"]')
 
-  for (const element of elements.reverse()) {
-    await element.click().then(() => sleep(100))
+  if (images?.length) {
+    await openButton?.click()
+    const uploadButton = await page.waitForSelector('[data-testid="ImageSuggestionsEditorModal.UploadZone.openFilePicker"]', { visible: true })
+
+    const [fileChooser] = await Promise.all([
+      page.waitForFileChooser(),
+      uploadButton?.click(),
+    ])
+
+    // FIXME - не читает файлы, не загружает
+    await fileChooser.accept(images)
+
+    const saveButton = await page.waitForSelector('[data-testid="ImageSuggestionsEditorModal.Save"]')
+    // Ждём, пока все загрузиться и кнопка станет активной (уберётся disabled)
+    await page.waitForFunction(
+      btn => !btn.hasAttribute('disabled'),
+      {},
+      saveButton,
+    )
+    await saveButton?.click()
+    await sleep(500) // Ждем наверняка закрытия модалки
   }
-
-  const [fileChooser] = await Promise.all([
-    page.waitForFileChooser(),
-    page.click('[data-testid="ImageSuggestionsEditorModal.UploadZone.openFilePicker"]'),
-  ])
-
-  await fileChooser.accept(images)
-
-  const saveButton = await page.waitForSelector('[data-testid="ImageSuggestionsEditorModal.Save"]')
-  // Ждём, пока все загрузиться и кнопка станет активной (уберётся disabled)
-  await page.waitForFunction(
-    btn => !btn.hasAttribute('disabled'),
-    {},
-    saveButton,
-  )
-  await saveButton?.click()
 }
 
 async function setVideos(page: Page, videos: string[]) {
   /* Требования: https://yandex.ru/support/direct/ru/efficiency/video */
-  await (await page.waitForSelector(`[data-testid="VideoSuggestionsEditor.Open"]`))?.click()
-  await page.waitForSelector('[data-testid="VideoSuggestionsEditor.SelectedCreativesGrid"]', { visible: true })
-  const elements = await page.$$('[data-testid^="VideoSuggestionsEditor.SelectedCreativesGrid.SelectedCreative.CloseButton."]')
+  const openButton = await page.waitForSelector(`[data-testid="VideoSuggestionsEditor.Open"]`, { visible: true })
+  await clearElements(page, '[data-testid^="VideoSuggestionsEditor.CampaignContents.CloseButton"]')
 
-  for (const element of elements.reverse()) {
-    await element.click().then(() => sleep(100))
+  if (videos?.length) {
+    await openButton?.click()
+    const uploadButton = await page.waitForSelector('[data-testid="FileUploadButton"]', { visible: true })
+
+    const [fileChooser] = await Promise.all([
+      page.waitForFileChooser(),
+      uploadButton?.click(),
+    ])
+
+    await fileChooser.accept(videos)
+
+    const saveButton = await page.waitForSelector('[data-testid="VideoSuggestionsEditor.Save"]')
+    // Ждём, пока все загрузиться и кнопка станет активной (уберётся disabled)
+    await page.waitForFunction(
+      btn => !btn.hasAttribute('disabled'),
+      {},
+      saveButton,
+    )
+    await saveButton?.click()
+    await sleep(500) // Ждем наверняка закрытия модалки
   }
-
-  const [fileChooser] = await Promise.all([
-    page.waitForFileChooser(),
-    page.click('[data-testid="FileUploadButton"]'),
-  ])
-
-  await fileChooser.accept(videos)
-
-  const saveButton = await page.waitForSelector('[data-testid="VideoSuggestionsEditor.Save"]')
-  // Ждём, пока все загрузиться и кнопка станет активной (уберётся disabled)
-  await page.waitForFunction(
-    btn => !btn.hasAttribute('disabled'),
-    {},
-    saveButton,
-  )
-  await saveButton?.click()
 }
 
 async function setSitelinks(page: Page, sitelinks: Sitelink[]) {
