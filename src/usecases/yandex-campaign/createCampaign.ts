@@ -32,12 +32,12 @@ export async function createCampaign(page: Page, login: string, campaign: Campai
 
   await setCampaignRecomendations(page, campaign.campaignRecomendations)
 
-  // await Promise.all([
-  //   page.waitForNavigation(),
-  //   page.click('button[data-testid="CampaignFormControls.save.button"]'),
-  // ])
+  await Promise.all([
+    page.waitForNavigation(),
+    page.click('button[data-testid="CampaignFormControls.save.button"]'),
+  ])
 
-  return 'https://link-to-new-campaign'
+  return page.url()
 }
 
 async function setUrl(page: Page, url: string) {
@@ -47,6 +47,10 @@ async function setUrl(page: Page, url: string) {
 }
 
 async function changeTitle(page: Page, title: string) {
+  if (!title) {
+    return
+  }
+
   const editButton = await page.waitForSelector('[data-testid="CampaignHeader.EditName.Button"]', { visible: true })
   await editButton?.click()
   const inputElement = await page.waitForSelector('[data-testid="ModalEditTitle.CampaignName"]')
