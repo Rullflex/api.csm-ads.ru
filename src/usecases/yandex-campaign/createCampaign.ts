@@ -284,13 +284,16 @@ async function setCampaignRecomendations(page: Page, campaignRecomendations: Cam
 }
 
 async function clearElements(page: Page, selector: string) {
-  let clearEl = await page.$(selector)
+  let clearEl: ElementHandle | null = null
 
-  while (clearEl) {
-    await clearEl.click()
-    await sleep(50) // Ждем пока элемент наверняка удалится из DOM
+  do {
     clearEl = await page.$(selector)
-  }
+
+    if (clearEl) {
+      await clearEl.evaluate(el => el.scrollIntoView())
+      await clearEl.click()
+    }
+  } while (clearEl)
 }
 
 async function clearInput(element: ElementHandle) {
