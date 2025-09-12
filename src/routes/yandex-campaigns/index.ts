@@ -12,11 +12,15 @@ import { createCampaignsByBrowser } from '@/usecases/yandex-campaign/createCampa
 const yandexCampaigns: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise<void> => {
   fastify.post('/create', async (req, _reply) => {
     const body = {} as Record<string, any>
-    const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'yc-uploads-'))
+    let tmpDir: string | null = null
 
     try {
       for await (const part of req.parts({ limits: { fileSize: 100 * 1024 * 1024 } })) {
         if (part.type === 'file') {
+          if (!tmpDir) {
+            tmpDir = await mkdtemp(path.join(os.tmpdir(), 'yc-uploads-'))
+          }
+
           const filePath = path.join(tmpDir, part.filename)
           await pipeline(part.file, createWriteStream(filePath))
           body[part.fieldname] = part.filename
@@ -34,7 +38,9 @@ const yandexCampaigns: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts)
       req.log.info(campaigns, 'Полученные компании')
       return await createCampaignsByBrowser(logins, campaigns)
     } finally {
-      await rm(tmpDir, { recursive: true, force: true })
+      if (tmpDir) {
+        await rm(tmpDir, { recursive: true, force: true })
+      }
     }
   })
 
