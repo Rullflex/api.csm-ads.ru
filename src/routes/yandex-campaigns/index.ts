@@ -30,13 +30,15 @@ const yandexCampaigns: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts)
       }
 
       // parse qs and normalize values to corresponding types
-      const { logins, campaigns } = normalizeValues(qs.parse(body, {
+      const parsedBody = normalizeValues(qs.parse(body, {
         strictDepth: true,
         throwOnLimitExceeded: true,
       }))
 
-      req.log.info(campaigns, 'Полученные компании')
-      return await createCampaignsByBrowser(logins, campaigns)
+      req.log.info(parsedBody)
+
+      const { logins, campaigns, isStAgency } = parsedBody
+      return await createCampaignsByBrowser(logins, campaigns, isStAgency)
     } finally {
       if (tmpDir) {
         await rm(tmpDir, { recursive: true, force: true })

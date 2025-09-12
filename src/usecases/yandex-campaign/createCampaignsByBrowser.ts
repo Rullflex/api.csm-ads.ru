@@ -5,10 +5,10 @@ import { createCampaign } from './createCampaign.js'
 
 const IS_SERVER = process.env.IS_SERVER === 'true'
 
-export async function createCampaignsByBrowser(logins: string[], campaigns: Campaign[]) {
+export async function createCampaignsByBrowser(logins: string[], campaigns: Campaign[], isStAgency = false) {
   const browser = await puppeteer.launch({
     headless: IS_SERVER,
-    userDataDir: `${process.cwd()}/user_data`,
+    userDataDir: `${process.cwd()}/puppeteer/tech-dp-direct${isStAgency ? '-st' : ''}-elama-data`,
     ...(IS_SERVER
       ? { executablePath: '/usr/bin/chromium-browser', args: ['--no-sandbox', '--disable-setuid-sandbox'] }
       : {}),
@@ -18,6 +18,7 @@ export async function createCampaignsByBrowser(logins: string[], campaigns: Camp
   const result = await page.goto('https://direct.yandex.ru', { timeout: 60000 })
 
   if (result?.url().includes('passport.yandex.ru')) {
+    throw new Error('Unauthorized') // Автоматическая авторизация не доделана
     await authorize(page)
   }
 
