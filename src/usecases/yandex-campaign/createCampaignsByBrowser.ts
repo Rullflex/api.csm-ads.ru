@@ -26,8 +26,8 @@ export async function createCampaignsByBrowser(logins: string[], campaigns: Camp
 
   for (const login of logins) {
     for (const campaign of campaigns) {
-      const url = await createCampaign(page, login, campaign)
-      newCampaignLinks.push(url)
+      const href = await createCampaign(page, login, campaign)
+      newCampaignLinks.push({ name: login, href })
     }
   }
 
