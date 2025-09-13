@@ -93,7 +93,6 @@ async function setImages(page: Page, images: string[]) {
       uploadButton?.click(),
     ])
 
-    // FIXME - не читает файлы, не загружает
     await fileChooser.accept(images)
 
     const saveButton = await page.waitForSelector('[data-testid="ImageSuggestionsEditorModal.Save"]')

@@ -11,7 +11,7 @@ import { createCampaignsByBrowser } from '@/usecases/yandex-campaign/createCampa
 
 const yandexCampaigns: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise<void> => {
   fastify.post('/create', async (req, _reply) => {
-    const body = {} as Record<string, any>
+    const fields: [string, string][] = []
     let tmpDir: string | null = null
 
     try {
@@ -23,14 +23,18 @@ const yandexCampaigns: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts)
 
           const filePath = path.join(tmpDir, part.filename)
           await pipeline(part.file, createWriteStream(filePath))
-          body[part.fieldname] = part.filename
+          fields.push([part.fieldname, filePath])
         } else {
-          body[part.fieldname] = part.value
+          fields.push([part.fieldname, part.value as string])
         }
       }
 
+      const queryString = fields
+        .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+        .join('&')
+
       // parse qs and normalize values to corresponding types
-      const parsedBody = normalizeValues(qs.parse(body, {
+      const parsedBody = normalizeValues(qs.parse(queryString, {
         strictDepth: true,
         throwOnLimitExceeded: true,
       }))
