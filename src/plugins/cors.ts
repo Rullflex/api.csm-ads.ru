@@ -16,7 +16,7 @@ export default fp<FastifySensibleOptions>(async (fastify) => {
       }
 
       const hostname = new URL(origin).hostname
-      if (hostname === 'localhost') {
+      if (hostname === 'localhost' || hostname.endsWith('csm-ads.ru')) {
         //  Request from localhost will pass
         cb(null, true)
         return
