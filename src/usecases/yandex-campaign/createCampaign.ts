@@ -33,9 +33,11 @@ export async function createCampaign(page: Page, login: string, campaign: Campai
   await setCampaignRecomendations(page, campaign.campaignRecomendations)
 
   await Promise.all([
-    page.waitForNavigation(),
+    page.waitForNavigation({ timeout: 60000 }),
     page.click('button[data-testid="CampaignFormControls.save.button"]'),
   ])
+
+  await sleep(1000) // Ждем полной прогрузки а то иначе почему-то не дает закрыть страницу, показывает алерт
 
   return page.url()
 }
