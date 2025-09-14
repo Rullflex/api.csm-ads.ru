@@ -106,7 +106,7 @@ async function setImages(page: Page, images: string[]) {
     // Ждём, пока все загрузиться и кнопка станет активной (уберётся disabled)
     await page.waitForFunction(
       btn => !btn.hasAttribute('disabled'),
-      {},
+      { timeout: 120000 },
       saveButton,
     )
     await saveButton?.click()
@@ -134,7 +134,7 @@ async function setVideos(page: Page, videos: string[]) {
     // Ждём, пока все загрузиться и кнопка станет активной (уберётся disabled)
     await page.waitForFunction(
       btn => !btn.hasAttribute('disabled'),
-      {},
+      { timeout: 240000 },
       saveButton,
     )
     await saveButton?.click()
