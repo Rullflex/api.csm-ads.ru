@@ -3,7 +3,12 @@ import type { Audience, Campaign, CampaignRecomendations, CampaignTarget, Siteli
 import { sleep } from '@/shared/utils/sleep.js'
 
 export async function createCampaign(page: Page, login: string, campaign: Campaign) {
-  await page.goto(`https://direct.yandex.ru/wizard/campaigns/new?ulogin=${login}`)
+  const result = await page.goto(`https://direct.yandex.ru/wizard/campaigns/new?ulogin=${login}`)
+
+  if (result?.url().includes('passport.yandex.ru')) {
+    throw new Error('Не авторизован')
+    // await authorize(page)
+  }
 
   await setUrl(page, campaign.fullUrl)
 
