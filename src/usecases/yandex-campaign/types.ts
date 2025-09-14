@@ -23,8 +23,8 @@ export interface Audience {
   gender: 'ALL' | 'Male' | 'Female'
   ageFrom: 'Age0' | 'Age18' | 'Age25' | 'Age35' | 'Age45' | 'Age55'
   ageTo: 'Age18' | 'Age25' | 'Age35' | 'Age45' | 'Age55' | 'AgeUnlimited'
-  interests: string[]
-  negativeKeywords: string[]
+  interests?: string[]
+  negativeKeywords?: string[]
   devices: ('desktop' | 'mobile' | 'tablet')[]
 }
 

@@ -180,7 +180,7 @@ async function setAudience(page: Page, audience: Audience) {
   await (await page.waitForSelector('[data-testid="AgeAndGenderEditor.AgeToSelect"]', { visible: true }))?.click()
   await (await page.waitForSelector(`[data-testid="AgeAndGenderEditor.AgeToSelect.ListBox.${audience.ageTo}"]`, { visible: true }))?.click()
 
-  if (audience.negativeKeywords.length) {
+  if (audience.negativeKeywords?.length) {
     await (await page.waitForSelector('[data-testid="InterestsAndExceptionsEditor.AddExceptionsButton"]'))?.click()
     await (await page.waitForSelector('[data-testid="ExceptionsEditor.TagGroup"]'))?.click()
     for (const negativeKeyword of audience.negativeKeywords) {
@@ -189,10 +189,12 @@ async function setAudience(page: Page, audience: Audience) {
     }
   }
 
-  await (await page.waitForSelector('[data-testid="CustomAudienceAndSearchTermsEditor.TagGroup"]'))?.click()
-  for (const interest of audience.interests) {
-    await page.keyboard.type(interest)
-    await page.keyboard.press('Enter')
+  if (audience.interests?.length) {
+    await (await page.waitForSelector('[data-testid="CustomAudienceAndSearchTermsEditor.TagGroup"]'))?.click()
+    for (const interest of audience.interests) {
+      await page.keyboard.type(interest)
+      await page.keyboard.press('Enter')
+    }
   }
 
   await (await page.waitForSelector('[data-testid="DeviceEditor.Select"]', { visible: true }))?.click()
