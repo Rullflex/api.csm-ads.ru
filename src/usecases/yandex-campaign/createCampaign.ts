@@ -63,7 +63,7 @@ async function changeTitle(page: Page, title: string) {
   const inputElement = await page.waitForSelector('[data-testid="ModalEditTitle.CampaignName"]')
   await inputElement?.click({ clickCount: 3 })
   await page.keyboard.press('Backspace')
-  await inputElement?.type(title)
+  await inputElement?.type(String(title))
   await (await page.waitForSelector('[data-testid="AcceptButton"]'))?.click()
   await sleep(200)
 }
@@ -72,8 +72,12 @@ async function setCampaignTitles(page: Page, titles: string[]) {
   await clearElements(page, '[data-testid^="CampaignTitles"][data-testid$=".clear"][class*="visible"]')
 
   for (let i = 0; i < titles.length; i++) {
-    await (await page.waitForSelector(`[data-testid="CampaignTitles${i}.textarea"]`))?.click()
-    await page.keyboard.type(titles[i]).then(() => sleep(100))
+    const input = await page.waitForSelector(`[data-testid="CampaignTitles${i}.textarea"]`)
+    await input?.evaluateHandle(e => e.scrollIntoView())
+    await input?.hover()
+    await sleep(100)
+    await input?.click()
+    await page.keyboard.type(String(titles[i]))
   }
 }
 
@@ -81,8 +85,12 @@ async function setCampaignTexts(page: Page, texts: string[]) {
   await clearElements(page, '[data-testid^="CampaignTexts"][data-testid$=".clear"][class*="visible"]')
 
   for (let i = 0; i < texts.length; i++) {
-    await (await page.waitForSelector(`[data-testid="CampaignTexts${i}.textarea"]`))?.click()
-    await page.keyboard.type(texts[i]).then(() => sleep(100))
+    const input = await page.waitForSelector(`[data-testid="CampaignTexts${i}.textarea"]`)
+    await input?.evaluateHandle(e => e.scrollIntoView())
+    await input?.hover()
+    await sleep(100)
+    await input?.click()
+    await page.keyboard.type(String(texts[i]))
   }
 }
 
