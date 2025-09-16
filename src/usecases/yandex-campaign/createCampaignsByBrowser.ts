@@ -27,7 +27,9 @@ export async function createCampaignsByBrowser(logins: string[], campaigns: Camp
       }
     }
   } finally {
-    await browser.close()
+    if (IS_SERVER) {
+      await browser.close()
+    }
   }
 
   return newCampaignLinks
