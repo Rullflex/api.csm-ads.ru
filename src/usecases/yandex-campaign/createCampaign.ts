@@ -282,7 +282,8 @@ async function setCampaignTarget(page: Page, campaignTarget: CampaignTarget) {
     }
   }
 
-  await (await page.waitForSelector('[data-testid^="BudgetWithSuggest.MultiButton.custom"]'))?.click()
+  await page.waitForSelector('[data-testid^="BudgetWithSuggest.MultiButton.custom"]', { visible: true })
+  await page.click('[data-testid^="BudgetWithSuggest.MultiButton.custom"]')
   const weeklyBudgetInput = await page.waitForSelector('[data-testid="BudgetWithSuggest.PriceTextInput"]')
   await clearInput(weeklyBudgetInput!)
   weeklyBudgetInput?.type(campaignTarget.weeklyBudget.toString())
