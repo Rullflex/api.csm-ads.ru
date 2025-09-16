@@ -17,6 +17,7 @@ export async function createCampaignsByBrowser(logins: string[], campaigns: Camp
 
   try {
     const page = await browser.newPage()
+    page.setDefaultTimeout(10000)
 
     for (const login of logins) {
       for (const campaign of campaigns) {
