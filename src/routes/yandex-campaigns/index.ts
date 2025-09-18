@@ -7,6 +7,7 @@ import { pipeline } from 'node:stream/promises'
 import qs from 'qs'
 import { http, httpSt, YandexDirectApi } from '@/shared/api/yandex-direct-api/index.js'
 import { normalizeValues } from '@/shared/utils/normalizeValues.js'
+import { authByBrowser } from '@/usecases/yandex-campaign/authByBrowser.js'
 import { createCampaignsByBrowser } from '@/usecases/yandex-campaign/createCampaignsByBrowser.js'
 
 const yandexCampaigns: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise<void> => {
@@ -48,6 +49,19 @@ const yandexCampaigns: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts)
         await rm(tmpDir, { recursive: true, force: true })
       }
     }
+  })
+
+  fastify.post('/auth', {
+    schema: {
+      body: {
+        type: 'object',
+        properties: {
+          isStAgency: { type: 'boolean', default: false },
+        },
+      },
+    },
+  }, async (req, _reply) => {
+    await authByBrowser(req.body.isStAgency)
   })
 
   fastify.get('/agencyclients', {

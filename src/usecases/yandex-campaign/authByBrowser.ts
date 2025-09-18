@@ -31,5 +31,3 @@ export async function authByBrowser(isStAgency = false) {
     }
   }
 }
-
-authByBrowser(process.argv.includes('--st-agency'))
