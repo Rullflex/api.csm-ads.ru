@@ -71,6 +71,10 @@ async function changeTitle(page: Page, title: string) {
 async function setCampaignTitles(page: Page, titles: string[]) {
   await clearElements(page, '[data-testid^="CampaignTitles"][data-testid$=".clear"][class*="visible"]')
 
+  if (!titles?.length) {
+    return
+  }
+
   for (let i = 0; i < titles.length; i++) {
     const input = await page.waitForSelector(`[data-testid="CampaignTitles${i}.textarea"]`)
     await input?.evaluateHandle(e => e.scrollIntoView())
@@ -83,6 +87,10 @@ async function setCampaignTitles(page: Page, titles: string[]) {
 
 async function setCampaignTexts(page: Page, texts: string[]) {
   await clearElements(page, '[data-testid^="CampaignTexts"][data-testid$=".clear"][class*="visible"]')
+
+  if (!texts?.length) {
+    return
+  }
 
   for (let i = 0; i < texts.length; i++) {
     const input = await page.waitForSelector(`[data-testid="CampaignTexts${i}.textarea"]`)
