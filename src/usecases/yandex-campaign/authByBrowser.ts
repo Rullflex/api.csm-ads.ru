@@ -7,6 +7,7 @@ export async function authByBrowser(isStAgency = false) {
   console.log(`[${new Date().toLocaleTimeString('ru')}] Запуск браузера...`)
   const browser = await puppeteer.launch({
     headless: IS_SERVER,
+    defaultViewport: { width: 1400, height: 800 },
     userDataDir: `${process.cwd()}/puppeteer/tech-dp-direct${isStAgency ? '-st' : ''}-elama-data`,
     ...(IS_SERVER
       ? { executablePath: '/usr/bin/chromium-browser', args: ['--no-sandbox', '--disable-setuid-sandbox'] }

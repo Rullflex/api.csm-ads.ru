@@ -36,7 +36,15 @@ export async function authorize(page: Page) {
   // Нажмите кнопку «Подтвердить», если вы можете принять звонок или сообщение на указанный номер. Это нужно для завершения входа.
   await (await page.waitForSelector('button[data-t="button\\:action"]'))?.click()
 
-  // TODO иногда делает звонок а не код и внизу появляется кнопка с таймером для подтверждения по смс
+  await sleep(500)
+  const smsCodeButton = await page.$('button[data-t="button\\:default\\:retry-to-request-code"]')
+
+  if (smsCodeButton) {
+    console.log('Похоже, что звонок не подходит, запрашиваем СМС')
+    await sleep(70000) // ждем минуту
+    await smsCodeButton.click()
+  }
+
   await page.waitForSelector('#passp-field-phoneCode')
 
   const code = await getAuthCode()
