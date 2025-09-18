@@ -5,7 +5,7 @@ import { createCampaign } from './createCampaign.js'
 const IS_SERVER = process.env.IS_SERVER === 'true'
 
 export async function createCampaignsByBrowser(logins: string[], campaigns: Campaign[], isStAgency = false) {
-  console.log('Запуск браузера...')
+  console.log(`[${new Date().toLocaleTimeString('ru')}] Запуск браузера...`)
   const browser = await puppeteer.launch({
     headless: IS_SERVER,
     userDataDir: `${process.cwd()}/puppeteer/tech-dp-direct${isStAgency ? '-st' : ''}-elama-data`,
@@ -17,15 +17,15 @@ export async function createCampaignsByBrowser(logins: string[], campaigns: Camp
   const newCampaignLinks = []
 
   try {
-    console.log('Открытие страницы...')
+    console.log(`[${new Date().toLocaleTimeString('ru')}] Открытие страницы...`)
     const page = await browser.newPage()
     page.setDefaultTimeout(10000)
 
     for (const login of logins) {
       for (const campaign of campaigns) {
-        console.log('Создание кампании...', login, campaign.name)
+        console.log(`[${new Date().toLocaleTimeString('ru')}] Создание кампании...`, login, campaign.name)
         const href = await createCampaign(page, login, campaign)
-        console.log('Создана кампания: ', href)
+        console.log(`[${new Date().toLocaleTimeString('ru')}] Создана кампания: ${href}`)
         newCampaignLinks.push({ name: `${login}-${campaign.name}`, href })
       }
     }
