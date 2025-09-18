@@ -3,7 +3,7 @@ import type { Audience, Campaign, CampaignRecomendations, CampaignTarget, Siteli
 import { sleep } from '@/shared/utils/sleep.js'
 
 export async function createCampaign(page: Page, login: string, campaign: Campaign) {
-  const result = await page.goto(`https://direct.yandex.ru/wizard/campaigns/new?ulogin=${login}`, { timeout: 30000 })
+  const result = await page.goto(`https://direct.yandex.ru/wizard/campaigns/new?ulogin=${login}`, { timeout: 60000 })
   console.log(`[${new Date().toLocaleTimeString('ru')}] Перешли на страницу: ${result?.url()}`)
 
   if (result?.url().includes('passport.yandex.ru')) {
