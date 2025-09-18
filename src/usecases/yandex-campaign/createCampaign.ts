@@ -4,6 +4,7 @@ import { sleep } from '@/shared/utils/sleep.js'
 
 export async function createCampaign(page: Page, login: string, campaign: Campaign) {
   const result = await page.goto(`https://direct.yandex.ru/wizard/campaigns/new?ulogin=${login}`, { timeout: 30000 })
+  console.log('Перешли на страницу: ', result?.url())
 
   if (result?.url().includes('passport.yandex.ru')) {
     throw new Error('Не авторизован')
@@ -14,6 +15,8 @@ export async function createCampaign(page: Page, login: string, campaign: Campai
 
   await page.waitForSelector('[data-testid="CampaignFormUc"]', { visible: true, timeout: 60000 })
   await sleep(200)
+
+  console.log('Заполняем данные кампании...')
 
   await changeTitle(page, campaign.name)
 
@@ -37,6 +40,7 @@ export async function createCampaign(page: Page, login: string, campaign: Campai
 
   await setCampaignRecomendations(page, campaign.campaignRecomendations)
 
+  console.log('Сохраняем кампанию...')
   await Promise.all([
     page.waitForNavigation({ timeout: 60000 }),
     page.click('button[data-testid="CampaignFormControls.save.button"]'),
