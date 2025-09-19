@@ -2,7 +2,7 @@ import { authorize } from './authorize.js'
 import { startBrowser } from './startBrowser.js'
 
 export async function authByBrowser({ login, password }: { login: string, password: string }) {
-  startBrowser(async (page) => {
+  await startBrowser(async (page) => {
     const result = await page.goto(`https://direct.yandex.ru/wizard/campaigns`)
 
     if (result?.url().includes('passport.yandex.ru')) {

@@ -7,7 +7,7 @@ export async function createCampaignsByBrowser(logins: string[], campaigns: Camp
 
   const login = isStAgency ? 'tech.dp.direct.elama.st' : 'tech.dp.direct.elama'
 
-  startBrowser(async (page) => {
+  await startBrowser(async (page) => {
     page.setDefaultTimeout(10000)
 
     for (const login of logins) {
