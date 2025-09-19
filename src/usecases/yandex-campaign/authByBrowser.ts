@@ -10,7 +10,7 @@ export async function authByBrowser({ login, password }: { login: string, passwo
     defaultViewport: { width: 1400, height: 800 },
     userDataDir: `${process.cwd()}/puppeteer-user-data/${login.split('@')[0]}`,
     ...(IS_SERVER
-      ? { executablePath: '/usr/bin/chromium-browser', args: ['--no-sandbox', '--disable-setuid-sandbox'] }
+      ? { executablePath: '/usr/bin/chromium-browser', args: ['--no-sandbox'] }
       : {}),
   })
 
