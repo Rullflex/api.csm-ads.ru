@@ -59,7 +59,6 @@ const yandexCampaigns: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts)
         properties: {
           login: { type: 'string' },
           password: { type: 'string' },
-          isStAgency: { type: 'boolean', default: false },
         },
       },
     },

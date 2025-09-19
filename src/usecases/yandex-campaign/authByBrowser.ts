@@ -3,12 +3,12 @@ import { authorize } from './authorize.js'
 
 const IS_SERVER = process.env.IS_SERVER === 'true'
 
-export async function authByBrowser({ login, password, isStAgency = false }: { login: string, password: string, isStAgency?: boolean }) {
+export async function authByBrowser({ login, password }: { login: string, password: string }) {
   console.log(`[${new Date().toLocaleTimeString('ru')}] Запуск браузера...`)
   const browser = await puppeteer.launch({
     headless: IS_SERVER,
     defaultViewport: { width: 1400, height: 800 },
-    userDataDir: `${process.cwd()}/puppeteer/tech-dp-direct${isStAgency ? '-st' : ''}-elama-data`,
+    userDataDir: `${process.cwd()}/puppeteer-user-data/${login.split('@')[0]}`,
     ...(IS_SERVER
       ? { executablePath: '/usr/bin/chromium-browser', args: ['--no-sandbox', '--disable-setuid-sandbox'] }
       : {}),
