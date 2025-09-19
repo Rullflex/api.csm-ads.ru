@@ -55,13 +55,16 @@ const yandexCampaigns: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts)
     schema: {
       body: {
         type: 'object',
+        required: ['login', 'password'],
         properties: {
+          login: { type: 'string' },
+          password: { type: 'string' },
           isStAgency: { type: 'boolean', default: false },
         },
       },
     },
   }, async (req, _reply) => {
-    await authByBrowser(req.body.isStAgency)
+    await authByBrowser(req.body)
   })
 
   fastify.get('/agencyclients', {

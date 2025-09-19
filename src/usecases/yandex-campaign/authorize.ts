@@ -1,6 +1,5 @@
 import type { Page } from 'puppeteer'
 import { sleep } from '../../shared/utils/sleep.js'
-import { YANDEX_LOGIN, YANDEX_PASSWORD } from './const.js'
 
 // enum PasspPages {
 //   LOGIN = 'page\\:add-account',
@@ -9,17 +8,17 @@ import { YANDEX_LOGIN, YANDEX_PASSWORD } from './const.js'
 //   УГРОЗА_ВЗЛОМА = 'page\\:change-password',
 // }
 
-export async function authorize(page: Page) {
+export async function authorize(page: Page, { login, password }: { login: string, password: string }) {
   // page\\:add-account
   const loginField = await page.waitForSelector('#passp-field-login')
-  await loginField?.type(YANDEX_LOGIN)
+  await loginField?.type(login)
   await page.keyboard.press('Enter')
 
   // TODO иногда просит qr код, тут лучше просто перезапускать а не ждать 5 минут
 
   // page\\:welcome
   const passwdField = await page.waitForSelector('#passp-field-passwd')
-  await passwdField?.type(YANDEX_PASSWORD)
+  await passwdField?.type(password)
   await page.keyboard.press('Enter')
 
   // TODO иногда может не запросить доп подтверждение и пройти авторизацию без ввода кодов
@@ -44,7 +43,7 @@ export async function authorize(page: Page) {
   const smsCodeButton = await page.$('button[data-t="button\\:default\\:retry-to-request-code"]')
 
   if (smsCodeButton) {
-    console.log('Похоже, что звонок не подходит, запрашиваем СМС')
+    console.log('Похоже, что звонок не подходит, ждем кнопку СМС')
     await sleep(70000) // ждем минуту
     await smsCodeButton.click()
   }

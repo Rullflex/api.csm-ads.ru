@@ -3,7 +3,7 @@ import { authorize } from './authorize.js'
 
 const IS_SERVER = process.env.IS_SERVER === 'true'
 
-export async function authByBrowser(isStAgency = false) {
+export async function authByBrowser({ login, password, isStAgency = false }: { login: string, password: string, isStAgency?: boolean }) {
   console.log(`[${new Date().toLocaleTimeString('ru')}] Запуск браузера...`)
   const browser = await puppeteer.launch({
     headless: IS_SERVER,
@@ -22,7 +22,7 @@ export async function authByBrowser(isStAgency = false) {
 
     if (result?.url().includes('passport.yandex.ru')) {
       console.log(`[${new Date().toLocaleTimeString('ru')}] Начинаем авторизацию...`)
-      await authorize(page)
+      await authorize(page, { login, password })
     } else {
       console.log(`[${new Date().toLocaleTimeString('ru')}] Пользователь уже авторизован`)
     }
