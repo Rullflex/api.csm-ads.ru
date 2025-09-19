@@ -3,8 +3,7 @@ import { createCampaign } from './createCampaign.js'
 import { startBrowser } from './startBrowser.js'
 
 export async function createCampaignsByBrowser(logins: string[], campaigns: Campaign[], isStAgency = false) {
-  const newCampaignLinks = []
-
+  const newCampaignLinks: { name: string, href: string }[] = []
   const login = isStAgency ? 'tech.dp.direct.elama.st' : 'tech.dp.direct.elama'
 
   await startBrowser(async (page) => {
@@ -19,4 +18,6 @@ export async function createCampaignsByBrowser(logins: string[], campaigns: Camp
       }
     }
   }, login)
+
+  return newCampaignLinks
 }
