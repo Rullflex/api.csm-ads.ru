@@ -25,7 +25,7 @@ export async function authorize(page: Page, { login, password }: { login: string
 
   // page\\:auth-challenge
 
-  const toggleChallengeButton = await page.waitForSelector('#passp\\:toggle-challenge', { timeout: 3000 }).catch() // ждем пока не появится поле для ввода кода или не выйдет таймаут
+  const toggleChallengeButton = await page.waitForSelector('#passp\\:toggle-challenge', { timeout: 3000 }).catch(() => null) // ждем пока не появится поле для ввода кода или не выйдет таймаут
 
   if (toggleChallengeButton) {
     console.log('Нажимаем на ссылку "Другой способ подтверждения"')

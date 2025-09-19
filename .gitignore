@@ -1,4 +1,4 @@
-puppeteer/*
+tech.dp*/*
 # Environment variables
 .env*
 !.env.example

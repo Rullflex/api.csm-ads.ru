@@ -1,23 +1,8 @@
-import puppeteer from 'puppeteer'
 import { authorize } from './authorize.js'
-
-const IS_SERVER = process.env.IS_SERVER === 'true'
+import { startBrowser } from './startBrowser.js'
 
 export async function authByBrowser({ login, password }: { login: string, password: string }) {
-  console.log(`[${new Date().toLocaleTimeString('ru')}] Запуск браузера...`)
-  const browser = await puppeteer.launch({
-    headless: IS_SERVER,
-    defaultViewport: { width: 1400, height: 800 },
-    userDataDir: `${process.cwd()}/puppeteer-user-data/${login.split('@')[0]}`,
-    ...(IS_SERVER
-      ? { executablePath: '/usr/bin/chromium-browser', args: ['--no-sandbox'] }
-      : {}),
-  })
-
-  try {
-    console.log(`[${new Date().toLocaleTimeString('ru')}] Открытие страницы...`)
-    const page = await browser.newPage()
-
+  startBrowser(async (page) => {
     const result = await page.goto(`https://direct.yandex.ru/wizard/campaigns`)
 
     if (result?.url().includes('passport.yandex.ru')) {
@@ -26,9 +11,5 @@ export async function authByBrowser({ login, password }: { login: string, passwo
     } else {
       console.log(`[${new Date().toLocaleTimeString('ru')}] Пользователь уже авторизован`)
     }
-  } finally {
-    if (IS_SERVER) {
-      await browser.close()
-    }
-  }
+  }, login.split('@')[0])
 }
