@@ -13,28 +13,32 @@ export async function authorize(page: Page) {
   // page\\:add-account
   const loginField = await page.waitForSelector('#passp-field-login')
   await loginField?.type(YANDEX_LOGIN)
-  await page.click('#passp\\:sign-in')
+  await page.keyboard.press('Enter')
 
   // TODO иногда просит qr код, тут лучше просто перезапускать а не ждать 5 минут
 
   // page\\:welcome
   const passwdField = await page.waitForSelector('#passp-field-passwd')
   await passwdField?.type(YANDEX_PASSWORD)
-  await page.click('#passp\\:sign-in')
+  await page.keyboard.press('Enter')
 
   // TODO иногда может не запросить доп подтверждение и пройти авторизацию без ввода кодов
 
   // page\\:auth-challenge
 
-  // TODO может не быть кнопки смены а липо пуш сразу и кнопка с таймером для подтверждения по смс
-  // TODO иногда сразу быть на кнопке подтверждения
-  // await page.waitForSelector('#passp\\:toggle-challenge') // TODO - если он находит ссылку то она почему-то не сразу кликабельна а через вермя
+  const toggleChallengeButton = await page.waitForSelector('#passp\\:toggle-challenge', { timeout: 3000 }).catch() // ждем пока не появится поле для ввода кода или не выйдет таймаут
+
+  if (toggleChallengeButton) {
+    console.log('Нажимаем на ссылку "Другой способ подтверждения"')
+    await sleep(300) // если он находит ссылку то она почему-то не сразу кликабельна а через время
+    await toggleChallengeButton.click()
+  }
+
   await sleep(3000)
-  // await page.click('#passp\\:toggle-challenge')
 
   // Безопасный вход
   // Нажмите кнопку «Подтвердить», если вы можете принять звонок или сообщение на указанный номер. Это нужно для завершения входа.
-  await (await page.waitForSelector('button[data-t="button\\:action"]'))?.click()
+  await (await page.waitForSelector('button[data-t="button\\:action"]', { timeout: 5000 }))?.click()
 
   await sleep(500)
   const smsCodeButton = await page.$('button[data-t="button\\:default\\:retry-to-request-code"]')
