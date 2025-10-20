@@ -13,12 +13,11 @@
   "scripts": {
     "test": "npm run build:ts && tsc -p test/tsconfig.json && FASTIFY_AUTOLOAD_TYPESCRIPT=1 node --test --experimental-test-coverage --loader ts-node/esm test/**/*.ts",
     "start": "npm run build:ts && fastify start -l info -P dist/app.js",
-    "build:ts": "tsc && tsc-alias -p tsconfig.json",
+    "build:ts": "tsc && tsc-alias",
     "watch:ts": "tsc -w",
     "dev": "pnpm run build:ts && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"pnpm:watch:ts\" \"pnpm:dev:start\"",
     "dev:start": "fastify start --ignore-watch=.ts$ -w -l info -P dist/app.js",
-    "build:prod": "NODE_OPTIONS='--max-old-space-size=4096' tsc && tsc-alias",
-    "start:prod": "fastify start -l warn dist/app.js",
+    "start:prod": "npm run build:ts && fastify start -l warn dist/app.js",
     "lint": "eslint",
     "lint:fix": "eslint --fix"
   },
