@@ -9,9 +9,6 @@ export async function startBrowser(action: (page: Page, browser: Browser) => Pro
     headless: IS_SERVER,
     defaultViewport: { width: 1400, height: 800 },
     userDataDir: login,
-    ...(IS_SERVER
-      ? { executablePath: '/usr/bin/chromium-browser', args: ['--no-sandbox'] }
-      : {}),
   })
 
   try {
