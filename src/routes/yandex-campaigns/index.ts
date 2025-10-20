@@ -15,8 +15,10 @@ const yandexCampaigns: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts)
     const fields: [string, string][] = []
     let tmpDir: string | null = null
 
+    const parts = req.parts({ limits: { fieldNameSize: 1000, fileSize: 110 * 1024 * 1024, files: 7, parts: 10000 } })
+
     try {
-      for await (const part of req.parts({ limits: { fileSize: 100 * 1024 * 1024 } })) {
+      for await (const part of parts) {
         if (part.type === 'file') {
           if (!tmpDir) {
             tmpDir = await mkdtemp(path.join(os.tmpdir(), 'yc-uploads-'))
