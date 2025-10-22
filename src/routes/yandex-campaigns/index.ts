@@ -42,7 +42,7 @@ const yandexCampaigns: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts)
         throwOnLimitExceeded: true,
       }))
 
-      req.log.info(parsedBody)
+      console.log('parsedBody', parsedBody)
 
       const { logins, campaigns, isStAgency } = parsedBody
       return await createCampaignsByBrowser(logins, campaigns, isStAgency)
