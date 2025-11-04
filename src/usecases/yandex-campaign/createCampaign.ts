@@ -52,8 +52,8 @@ export async function createCampaign(page: Page, login: string, campaign: Campai
 }
 
 async function setUrl(page: Page, url: string) {
-  await (await page.waitForSelector('[data-testid="CampaignFormUrl.Textinput"]'))?.click()
-  await page.keyboard.type(url)
+  const urlInput = (await page.waitForSelector('[data-testid="CampaignFormUrl.Textinput"]'))!
+  await fillContenteditableInput(urlInput, url)
   await page.keyboard.press('Enter')
 }
 
@@ -80,12 +80,9 @@ async function setCampaignTitles(page: Page, titles: string[]) {
   }
 
   for (let i = 0; i < titles.length; i++) {
-    const input = await page.waitForSelector(`[data-testid="CampaignTitles${i}.textarea"]`)
-    await input?.evaluateHandle(e => e.scrollIntoView())
-    await input?.hover()
-    await sleep(100)
-    await input?.click()
-    await page.keyboard.type(String(titles[i]))
+    const input = (await page.waitForSelector(`[data-testid="CampaignTitles${i}.textarea"]`))!
+    await input.evaluateHandle(e => e.scrollIntoView())
+    await fillContenteditableInput(input, String(titles[i]))
   }
 }
 
@@ -97,12 +94,9 @@ async function setCampaignTexts(page: Page, texts: string[]) {
   }
 
   for (let i = 0; i < texts.length; i++) {
-    const input = await page.waitForSelector(`[data-testid="CampaignTexts${i}.textarea"]`)
-    await input?.evaluateHandle(e => e.scrollIntoView())
-    await input?.hover()
-    await sleep(100)
-    await input?.click()
-    await page.keyboard.type(String(texts[i]))
+    const input = (await page.waitForSelector(`[data-testid="CampaignTexts${i}.textarea"]`))!
+    await input.evaluateHandle(e => e.scrollIntoView())
+    await fillContenteditableInput(input, String(texts[i]))
   }
 }
 
@@ -170,12 +164,16 @@ async function setSitelinks(page: Page, sitelinks: Sitelink[]) {
   }
 
   for (let i = 0; i < sitelinks.length; i++) {
-    await (await page.waitForSelector(`[data-testid="SitelinkRow.href.textarea"]`))?.click()
-    await page.keyboard.type(sitelinks[i].href)
-    await (await page.waitForSelector(`[data-testid="SitelinkRow.name.textarea"]`))?.click()
-    await page.keyboard.type(sitelinks[i].name)
-    await (await page.waitForSelector(`[data-testid="SitelinkRow.description.textarea"]`))?.click()
-    await page.keyboard.type(sitelinks[i].description)
+    const { href, name, description } = sitelinks[i]
+    const hrefInput = (await page.waitForSelector(`[data-testid="SitelinkRow.href.textarea"]`))!
+    if (href)
+      await fillContenteditableInput(hrefInput, href)
+    const nameInput = (await page.waitForSelector(`[data-testid="SitelinkRow.name.textarea"]`))!
+    if (name)
+      await fillContenteditableInput(nameInput, name)
+    const descriptionInput = (await page.waitForSelector(`[data-testid="SitelinkRow.description.textarea"]`))!
+    if (description)
+      await fillContenteditableInput(descriptionInput, description)
 
     await sleep(100)
 
@@ -338,4 +336,11 @@ async function clearInput(element: ElementHandle) {
     el.value = ''
     el.dispatchEvent(new Event('input', { bubbles: true }))
   })
+}
+async function fillContenteditableInput(element: ElementHandle, text: string) {
+  await element.evaluate((el, text) => {
+    el.textContent = text
+    el.dispatchEvent(new Event('input', { bubbles: true }))
+    el.dispatchEvent(new Event('change', { bubbles: true }))
+  }, text)
 }
