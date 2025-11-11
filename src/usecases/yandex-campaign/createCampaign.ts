@@ -178,23 +178,26 @@ async function setSitelinks(page: Page, sitelinks: Sitelink[]) {
 
   for (let i = 0; i < sitelinks.length; i++) {
     const { href, name, description } = sitelinks[i]
+    // NOTE - была ошибка что найти не может по таймауту, но пока не понимаю почему
     const hrefInput = (await page.waitForSelector(`[data-testid="SitelinkRow.href.textarea"]`))!
-    if (href)
+    if (href) {
+      await hrefInput.evaluateHandle(e => e.scrollIntoView())
       await fillContenteditableInput(hrefInput, href)
+    }
     const nameInput = (await page.waitForSelector(`[data-testid="SitelinkRow.name.textarea"]`))!
-    if (name)
+    if (name) {
+      await nameInput.evaluateHandle(e => e.scrollIntoView())
       await fillContenteditableInput(nameInput, name)
+    }
     const descriptionInput = (await page.waitForSelector(`[data-testid="SitelinkRow.description.textarea"]`))!
-    if (description)
+    if (description) {
+      await descriptionInput.evaluateHandle(e => e.scrollIntoView())
       await fillContenteditableInput(descriptionInput, description)
-
-    await sleep(100)
+    }
 
     if (i !== sitelinks.length - 1) {
       await page.click(`[data-testid="CampaignFormSitelinks.button"]`)
     }
-
-    await sleep(100)
   }
 }
 
