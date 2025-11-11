@@ -42,7 +42,7 @@ const yandexCampaigns: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts)
         throwOnLimitExceeded: true,
       }))
 
-      console.log('parsedBody', JSON.stringify(parsedBody))
+      console.log(`[${new Date().toLocaleString('ru')}]`, JSON.stringify(parsedBody))
 
       const { logins, campaigns, isStAgency } = parsedBody
       return await createCampaignsByBrowser(logins, campaigns, isStAgency)
