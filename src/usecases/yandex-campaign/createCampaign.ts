@@ -7,7 +7,20 @@ export async function createCampaign(page: Page, login: string, campaign: Campai
   console.log(`[${new Date().toLocaleTimeString('ru')}] Перешли на страницу: ${result?.url()}`)
 
   if (result?.url().includes('passport.yandex.ru')) {
-    throw new Error('Не авторизован')
+    try {
+      // проверяем зашел ли на страницу с выбором аккаунта
+      const link = await page.waitForSelector('[data-t="account-list-item-info"]')
+      if (link) {
+        console.log(`[${new Date().toLocaleTimeString('ru')}] Выбираем аккаунт для входа...`)
+        await Promise.all([
+          page.waitForNavigation(),
+          link.click(),
+        ])
+      }
+    } catch {
+      throw new Error('Не авторизован')
+    }
+
     // await authorize(page)
   }
 

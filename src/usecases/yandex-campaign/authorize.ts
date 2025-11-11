@@ -2,6 +2,7 @@ import type { Page } from 'puppeteer'
 import { sleep } from '../../shared/utils/sleep.js'
 
 // enum PasspPages {
+//   LIST = 'page\\:list', // Выберите аккаунт для входа
 //   LOGIN = 'page\\:add-account',
 //   PASSWORD = 'page\\:welcome',
 //   CODE = 'page\\:auth-challenge',
