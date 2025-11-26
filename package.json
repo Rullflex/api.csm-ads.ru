@@ -12,9 +12,6 @@
   "scripts": {
     "start": "npm run build && fastify start dist/app.js",
     "build": "tsc && tsc-alias",
-    "build:watch": "tsc && (concurrently \"tsc -w\" \"tsc-alias -w\")",
-    "dev": "concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"pnpm:build:watch\" \"pnpm:dev:start\"",
-    "dev:start": "nodemon --watch dist/app.js --delay 500 --ext js --exec \"pnpm exec fastify start dist/app.js\"",
     "test": "npm run build && tsc -p test/tsconfig.json && tsc-alias -p test/tsconfig.json && FASTIFY_AUTOLOAD_TYPESCRIPT=1 node --test --experimental-test-coverage --loader ts-node/esm test/**/*.ts",
     "lint": "eslint",
     "lint:fix": "eslint --fix"
@@ -43,14 +40,11 @@
     "@types/node": "^22.1.0",
     "@types/qs": "^6.14.0",
     "c8": "^10.1.2",
-    "concurrently": "^9.0.0",
     "eslint": "^9.33.0",
     "fastify-tsconfig": "^3.0.0",
     "json-schema-to-ts": "^3.1.1",
-    "nodemon": "^2.0.22",
     "ts-node": "^10.4.0",
     "tsc-alias": "^1.8.16",
-    "tsc-watch": "^7.2.0",
     "typescript": "~5.8.2"
   }
 }
