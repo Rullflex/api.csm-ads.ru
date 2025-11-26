@@ -10,7 +10,7 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise<v
   }, async (req, reply) => {
     const { username, password } = req.body
 
-    if (username === 'admin' && password === process.env.ADMIN_PASSWORD) {
+    if (username === 'admin' && password === fastify.config.ADMIN_PASSWORD) {
       const token = fastify.jwt.sign({ user: 'Администратор' })
       return { token }
     }

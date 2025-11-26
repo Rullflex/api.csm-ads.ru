@@ -24,13 +24,14 @@
   "dependencies": {
     "@fastify/autoload": "^6.0.0",
     "@fastify/cors": "^11.1.0",
+    "@fastify/env": "^5.0.3",
     "@fastify/formbody": "^8.0.2",
     "@fastify/jwt": "^10.0.0",
     "@fastify/multipart": "^9.0.3",
     "@fastify/sensible": "^6.0.0",
     "axios": "^1.11.0",
     "dotenv": "^17.2.1",
-    "fastify": "^5.0.0",
+    "fastify": "^5.6.2",
     "fastify-cli": "^7.4.0",
     "fastify-plugin": "^5.0.0",
     "puppeteer": "^24.16.2",
@@ -47,6 +48,7 @@
     "concurrently": "^9.0.0",
     "eslint": "^9.33.0",
     "fastify-tsconfig": "^3.0.0",
+    "json-schema-to-ts": "^3.1.1",
     "ts-node": "^10.4.0",
     "tsc-alias": "^1.8.16",
     "typescript": "~5.8.2"
