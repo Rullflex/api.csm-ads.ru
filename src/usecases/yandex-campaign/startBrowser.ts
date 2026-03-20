@@ -8,6 +8,7 @@ export async function startBrowser(action: (page: Page, browser: Browser) => Pro
   const browser = await puppeteer.launch({
     headless: IS_SERVER,
     defaultViewport: { width: 1400, height: 800 },
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
     userDataDir: login,
   })
 
